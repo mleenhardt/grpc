@@ -38,19 +38,14 @@ export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer-3.5
 
 # Ensure that programs depending on current-user-ownership of cache directories
 # are satisfied (it's being mounted from outside the image).
-chown `whoami` $XDG_CACHE_HOME
+chown $(whoami) $XDG_CACHE_HOME
 
 mkdir -p /var/local/git
 git clone --recursive /var/local/jenkins/grpc /var/local/git/grpc
 
-nvm use 0.12 || true
-
-if [ -x "$(command -v rvm)" ]
-then
-  rvm use ruby-2.1
-fi
-
 mkdir -p reports
+
+$POST_GIT_STEP
 
 exit_code=0
 
@@ -67,5 +62,6 @@ echo '</body></html>' >> index.html
 cd ..
 
 zip -r reports.zip reports
+find . -name report.xml | xargs zip reports.zip
 
 exit $exit_code

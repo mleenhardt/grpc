@@ -29,8 +29,11 @@
 
 FROM fedora:21
 
-RUN yum clean all
-RUN yum update -y
-RUN yum install -y git
-RUN yum install -y ruby
+# Make yum work properly under docker when using overlay storage driver.
+# https://bugzilla.redhat.com/show_bug.cgi?id=1213602#c9
+# https://github.com/docker/docker/issues/10180
+RUN yum install -y yum-plugin-ovl
 
+RUN yum clean all && yum update -y && yum install -y ruby
+
+RUN gem install bundler
